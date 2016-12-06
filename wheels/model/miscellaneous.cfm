@@ -125,6 +125,10 @@
 	* PRIVATE METHODS
 	*/
 
+	function $getClass() {
+		return variables.wheels.class;
+	}
+
 	public string function $objectId() {
 		return variables.wheels.tickCountId;
 	}
