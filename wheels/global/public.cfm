@@ -154,6 +154,9 @@
 	}
 
 	public any function model(required string name) {
+		if (!application.wheels.modelsPreloaded) {
+			$simpleLock(name="preloadModelLock", execute="$preloadModels", type="exclusive");
+		}
 		return $doubleCheckedLock(name="modelLock#application.applicationName#", condition="$cachedModelClassExists", execute="$createModelClass", conditionArgs=arguments, executeArgs=arguments);
 	}
 

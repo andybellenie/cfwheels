@@ -796,6 +796,7 @@
 
 	public void function $clearModelInitializationCache() {
 		StructClear(application.wheels.models);
+		application.wheels.modelsPreloaded = false;
 	}
 
 	public void function $clearControllerInitializationCache() {
@@ -1076,4 +1077,48 @@
 
 		return local.path;
 	}
+
+
+	function $preloadModels() {
+		local.files = $directory(directory=application.wheels.modelPath, action="list");
+		for (local.row in local.files) {
+			try {
+				$invoke(method="$createModelClass", name=ListFirst(local.files.name, "."));
+			}
+			catch (any) {
+			}
+		};
+		if (application.wheels.automaticAssociations) {
+			$setupAutomaticAssocations();
+		}
+		application.wheels.modelsPreloaded = true;
+	};
+
+
+	function $setupAutomaticAssocations() {
+		// create a struct with each model table name for quick lookup
+		for (local.modelName in application.wheels.models) {
+			local.names[application.wheels.models[local.modelName].tableName()] = {
+				singular = local.modelName,
+				plural = Pluralize(local.modelName)
+				};
+		};
+		// loop over each model and load associations
+		for (local.modelName in application.wheels.models) {
+			local.model = application.wheels.models[local.modelName];
+			if (StructKeyExists(local.model.$getClass(), "adapter")) {
+				local.associations = local.model.$getClass().adapter.$getAssociations(local.model.tableName());
+				for (local.asc in local.associations) {
+					// belongsTo
+					if (local.asc.method eq "belongsTo" && !StructKeyExists(local.model.$getClass().associations, local.names[local.asc.tableName].singular)) {
+						local.model.belongsTo(name=local.names[local.asc.tableName].singular, foreignKey=local.asc.foreignKey, joinKey=local.asc.joinKey);
+					// hasMany
+					} else if (local.asc.method eq "hasMany" && !StructKeyExists(local.model.$getClass().associations, local.names[local.asc.tableName].plural)) {
+						local.model.hasMany(name=local.names[local.asc.tableName].plural, foreignKey=local.asc.foreignKey, joinKey=local.asc.joinKey);
+					}
+				};
+			}
+		};
+	}
+
 </cfscript>

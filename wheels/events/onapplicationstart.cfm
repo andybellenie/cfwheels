@@ -217,6 +217,7 @@ public void function onApplicationStart() {
 	application.$wheels.loadDefaultRoutes = true;
 	application.$wheels.automaticValidations = true;
 	application.$wheels.automaticAssociations = true;
+	application.$wheels.modelsPreloaded = false;
 	application.$wheels.setUpdatedAtOnCreate = true;
 	application.$wheels.useExpandedColumnAliases = false;
 	application.$wheels.modelRequireInit = false;
