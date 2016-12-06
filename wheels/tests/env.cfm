@@ -6,7 +6,6 @@ application.wheels.dataSourceName = "wheelstestdb";
 
 /* turn off default validations for testing */
 application.wheels.automaticValidations = false;
-application.wheels.automaticAssociations = false;
 application.wheels.assetQueryString = false;
 application.wheels.assetPaths = false;
 
